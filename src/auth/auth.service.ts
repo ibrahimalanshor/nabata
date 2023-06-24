@@ -1,16 +1,20 @@
-import { UnauthorizedException } from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
+import { BadRequestException, Injectable, UnauthorizedException } from "@nestjs/common";
 import { User } from "src/user/user.entity";
-import { EntityNotFoundError, Repository } from "typeorm";
-import { compare, hash } from 'bcrypt'
+import { EntityNotFoundError } from "typeorm";
+import { compare } from 'bcrypt'
 import { JwtService } from "@nestjs/jwt";
+import { UserService } from "src/user/user.service";
+import {  } from 'typeorm'
 
+@Injectable()
 export class AuthService {
-    constructor(@InjectRepository(User) private userRepository: Repository<User>, private jwtService: JwtService) {}
+    constructor(private userService: UserService, private jwtService: JwtService) {}
 
     async attemp(options: { credential: { email: string, password: string }}): Promise<User> {
         try {
-            const user = await this.userRepository.findOneByOrFail({ email: options.credential.email })
+            const user = await this.userService.findOne({
+                filter: { email: options.credential.email }
+            })
 
             if (!(await compare(options.credential.password, user.password))) {
                 throw new UnauthorizedException("Password Incorrect")
@@ -36,5 +40,21 @@ export class AuthService {
         const user = await this.attemp({ credential: options.credential })
 
         return await this.generateToken(user)
+    }
+
+    async register(options: { credential: Partial<User> }): Promise<string> {
+        try {
+            const user = await this.userService.create({
+                values: options.credential
+            })
+    
+            return await this.generateToken(user)
+        } catch (err) {
+            if (err.errno === 1062) {
+                throw new BadRequestException("Email already exists")
+            }
+
+            throw err
+        }
     }
 }
