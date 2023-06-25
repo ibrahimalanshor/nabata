@@ -4,12 +4,13 @@ import { EntityNotFoundError } from "typeorm";
 import { compare } from 'bcrypt'
 import { JwtService } from "@nestjs/jwt";
 import { UserService } from "src/user/user.service";
+import { AttempOptions, GenereateTokenOptions, LoginOptions, RegisterOptions } from "./auth.contract";
 
 @Injectable()
 export class AuthService {
     constructor(private userService: UserService, private jwtService: JwtService) {}
 
-    async attemp(options: { credential: { email: string, password: string }}): Promise<User> {
+    async attemp(options: AttempOptions): Promise<User> {
         try {
             const user = await this.userService.findOne({
                 filter: { email: options.credential.email }
@@ -29,25 +30,25 @@ export class AuthService {
         }
     }
 
-    async generateToken(user: User): Promise<string> {
+    async generateToken(options: GenereateTokenOptions): Promise<string> {
         return await this.jwtService.sign({
-            user_id: user.id
+            user_id: options.user.id
         }, { expiresIn: '15m' })
     }
     
-    async login(options: { credential: { email: string, password: string } }): Promise<string> {
+    async login(options: LoginOptions): Promise<string> {
         const user = await this.attemp({ credential: options.credential })
 
-        return await this.generateToken(user)
+        return await this.generateToken({ user })
     }
 
-    async register(options: { credential: Partial<User> }): Promise<string> {
+    async register(options: RegisterOptions): Promise<string> {
         try {
             const user = await this.userService.create({
-                values: options.credential
+                values: options.user
             })
     
-            return await this.generateToken(user)
+            return await this.generateToken({ user })
         } catch (err) {
             if (err instanceof ConflictException) {
                 throw new BadRequestException("Email already exists")

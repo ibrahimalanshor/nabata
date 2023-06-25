@@ -19,7 +19,7 @@ export class AuthController {
     @HttpCode(200)
     async register(@Body() registerDto: RegisterDto) {
         return {
-            accessToken: await this.authService.register({ credential: registerDto })
+            accessToken: await this.authService.register({ user: registerDto })
         }
     }
 }
