@@ -9,7 +9,7 @@ export class Balance {
     @Column()
     name: string
 
-    @Column()
+    @Column({ default: 0 })
     amount: number
 
     @Column()

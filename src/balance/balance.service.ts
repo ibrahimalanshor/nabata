@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Balance } from './balance.entity';
 import { Repository } from 'typeorm';
-import { GetAllBalanceOptions } from './balance.contract';
+import { CreateBalanceOptions, GetAllBalanceOptions } from './balance.contract';
 
 @Injectable()
 export class BalanceService {
@@ -16,5 +16,13 @@ export class BalanceService {
         })
 
         return { count, data }
+    }
+
+    async create(options: CreateBalanceOptions) {
+        const balance = this.balanceRepository.create(options.values)
+
+        await this.balanceRepository.save(balance)
+
+        return balance
     }
 }
