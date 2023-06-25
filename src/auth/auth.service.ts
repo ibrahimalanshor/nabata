@@ -1,10 +1,9 @@
-import { BadRequestException, Injectable, UnauthorizedException } from "@nestjs/common";
+import { BadRequestException, ConflictException, Injectable, UnauthorizedException } from "@nestjs/common";
 import { User } from "src/user/user.entity";
 import { EntityNotFoundError } from "typeorm";
 import { compare } from 'bcrypt'
 import { JwtService } from "@nestjs/jwt";
 import { UserService } from "src/user/user.service";
-import {  } from 'typeorm'
 
 @Injectable()
 export class AuthService {
@@ -50,7 +49,7 @@ export class AuthService {
     
             return await this.generateToken(user)
         } catch (err) {
-            if (err.errno === 1062) {
+            if (err instanceof ConflictException) {
                 throw new BadRequestException("Email already exists")
             }
 

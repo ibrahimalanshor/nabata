@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { ConflictException, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { hash } from "bcrypt";
 import { User } from "src/user/user.entity";
@@ -13,13 +13,21 @@ export class UserService {
     }
 
     async create(options: { values: Partial<User> }): Promise<User> {
-        const user = this.userRepository.create({
-            ...options.values,
-            password: await hash(options.values.password, 10)
-        })
-        
-        await this.userRepository.insert(user)
-        
-        return user
+        try {
+            const user = this.userRepository.create({
+                ...options.values,
+                password: await hash(options.values.password, 10)
+            })
+            
+            await this.userRepository.insert(user)
+            
+            return user
+        } catch (err) {
+            if (err.errno === 1062) {
+                throw new ConflictException
+            }
+
+            throw err
+        }
     }
 }
