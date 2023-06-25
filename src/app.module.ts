@@ -2,12 +2,16 @@ import { Module } from '@nestjs/common';
 import { AuthModule } from './auth/auth.module';
 import { DatabaseModule } from './database/database.module';
 import { ConfigModule } from '@nestjs/config';
+import { BalanceModule } from './balance/balance.module';
+import { JwtModule } from './jwt/jwt.module';
 
 @Module({
   imports: [
-    AuthModule,
+    ConfigModule.forRoot({ isGlobal: true }),
     DatabaseModule,
-    ConfigModule.forRoot()
+    JwtModule,
+    AuthModule,
+    BalanceModule
   ],
   controllers: [],
   providers: [],

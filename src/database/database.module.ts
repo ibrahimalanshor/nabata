@@ -1,6 +1,7 @@
 import { Module } from "@nestjs/common";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { TypeOrmModule } from "@nestjs/typeorm";
+import { Balance } from "src/balance/balance.entity";
 import { User } from "src/user/user.entity";
 
 @Module({
@@ -15,10 +16,11 @@ import { User } from "src/user/user.entity";
         username: configService.get('MYSQL_USER'),
         password: configService.get('MYSQL_PASSWORD'),
         database: configService.get('MYSQL_DATABASE'),
-        entities: [User],
+        entities: [User, Balance],
         synchronize: true
       })
     })
   ],
+  exports: [TypeOrmModule]
 })
 export class DatabaseModule {}
