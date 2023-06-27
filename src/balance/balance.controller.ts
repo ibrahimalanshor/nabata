@@ -13,9 +13,11 @@ export class BalanceController {
     @Get()
     @UseGuards(AuthGuard)
     async getAll(@Auth('user') user: User, @Query() query: GetAllDto) {
+        console.log(query)
         return await this.balanceService.findAll({
             filter: { userId: user.id },
-            page: query.page
+            page: query.page,
+            // order: query.order
         })
     }
 

@@ -17,7 +17,8 @@ export class BalanceService {
                 userId: options.filter.userId
             },
             skip: page.skip,
-            take: page.take
+            take: page.take,
+            order: options.order
         })
 
         return { count, data }

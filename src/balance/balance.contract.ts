@@ -7,7 +7,8 @@ export interface GetAllBalanceOptions {
     page?: {
         size: number
         number: number
-    }
+    },
+    order?: Record<string, 'asc' | 'desc'>
 }
 
 export interface CreateBalanceOptions {
